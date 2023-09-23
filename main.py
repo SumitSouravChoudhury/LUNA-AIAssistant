@@ -41,18 +41,14 @@ def takeCommand():
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
-        r.adjust_for_ambient_noise(source, duration=1)
-
+        audio = r.listen(source, timeout=10) 
     try:
-        r.dynamic_energy_threshold = True
-        audio = r.listen(source, timeout=5, phrase_time_limit=5)
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-in')
         print(f"User said: {query}\n")
 
     except Exception as e:
         print("Say that again please")
-        speak("Say that again please")
         return "None"
     return query
 
@@ -155,8 +151,9 @@ if __name__ == "__main__":
             songs = os.listdir(music_dir)
             os.startfile(os.path.join(music_dir, random.choice(songs)))
             
-        elif "play a song" in query:
-            
+        elif "play a song by" in query:
+            song = query.replace("play a song by", "")
+            wk.playonyt(song)
 
         elif "close music" in query:
             os.system("taskkill /f /im vlc.exe")
@@ -261,6 +258,10 @@ if __name__ == "__main__":
             pyautogui.hotkey('alt', 'space')
             time.sleep(1)
             pyautogui.press('n')
+            
+        elif "play" in query:
+            vid = query.replace("play", "")
+            wk.playonyt(vid)
 
         elif "what is" in query:
             print("Searching Wikipedia")
