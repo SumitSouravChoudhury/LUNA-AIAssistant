@@ -6,7 +6,7 @@ import wikipedia
 import openai
 import os
 
-class AlexaAssistant:
+class Luna:
     def __init__(self):
         self.chat_history = ""
         self.listener = sr.Recognizer()
@@ -26,8 +26,8 @@ class AlexaAssistant:
                 voice = self.listener.listen(source)
                 command = self.listener.recognize_google(voice)
                 command = command.lower()
-                if 'alexa' in command:
-                    command = command.replace('alexa', '')
+                if 'luna' in command:
+                    command = command.replace('luna', '')
                     print(command)
         except sr.UnknownValueError:
             print("Sorry, I didn't catch that. Please repeat.")
@@ -70,7 +70,7 @@ class AlexaAssistant:
             print(f"Error: {str(e)}")
 
 
-    def run_alexa(self):
+    def run_luna(self):
         command = self.take_command()
         if not command:
             return
@@ -94,7 +94,7 @@ class AlexaAssistant:
             self.chat(command)
 
 if __name__ == "__main__":
-    assistant = AlexaAssistant()
-    assistant.talk('Good Day Sir! I am Alexa, how may I assist you today?')
+    assistant = Luna()
+    assistant.talk('Good Day Sir! I am Luna, how may I assist you today?')
     while True:
-        assistant.run_alexa()
+        assistant.run_luna()
