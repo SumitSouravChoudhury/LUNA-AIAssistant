@@ -145,6 +145,11 @@ if __name__ == "__main__":
 
         elif "close paint" in query:
             os.system("taskkill /f /im mspaint.exe")
+            
+        elif "tell me a joke" in query:
+            results = wikipedia.summary(query, sentences=2)
+            print(results)
+            speak(results)
 
         elif "play music" in query:
             music_dir = r"C:\Users\Sumit\Music"
