@@ -13,7 +13,7 @@ class Luna:
         self.engine = pyttsx3.init()
         self.voices = self.engine.getProperty('voices')
         self.engine.setProperty('voice', self.voices[1].id)
-        self.openai_api_key = "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"
+        self.openai_api_key = "MY_API_KEY"
 
     def talk(self, text):
         self.engine.say(text)
