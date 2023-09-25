@@ -12,6 +12,7 @@ import pyautogui
 import time
 import operator
 import requests
+from selenium import webdriver
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -112,6 +113,21 @@ if __name__ == "__main__":
             qrry = takeCommand().lower()
             webbrowser.open_new_tab(
                 f"www.youtube.com/results?search_query={qrry}")
+            
+        elif "open WhatsApp" in query:
+            webbrowser.open_new_tab("web.whatsapp.com")
+            print("WhatsApp Web is now open in your default web browser.")
+            speak("WhatsApp Web is now open in your default web browser.")
+            
+        elif "open chat of" in query:
+            name = query.replace("open chat of", "").strip()  
+            pyautogui.click(x=100, y=100)  
+            time.sleep(1)
+            pyautogui.write(name, interval=0.1)  
+            time.sleep(1)  
+            pyautogui.press("enter")
+            print(f"Opening chat with {name} in WhatsApp.")
+            speak(f"Opening chat with {name} in WhatsApp.")
 
         elif "close youtube" in query:
             os.system("taskkill /f /im msedge.exe")
