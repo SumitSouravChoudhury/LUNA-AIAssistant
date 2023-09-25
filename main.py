@@ -41,7 +41,7 @@ def takeCommand():
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
-        audio = r.listen(source, timeout=10) 
+        audio = r.listen(source, timeout=10)
     try:
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-in')
@@ -123,6 +123,17 @@ if __name__ == "__main__":
         elif "close chrome" in query:
             os.system("taskkill /f /im chrome.exe")
 
+        elif "tell me a joke" in query:
+            joke_url = "https://official-joke-api.appspot.com/random_joke"
+            response = requests.get(joke_url)
+            if response.status_code == 200:
+                joke_data = response.json()
+                joke_setup = joke_data["setup"]
+                joke_punchline = joke_data["punchline"]
+                joke = f"{joke_setup} {joke_punchline}"
+                print(joke)
+                speak(joke)
+
         elif "open new window" in query:
             pyautogui.hotkey('ctrl', 'n')
 
@@ -145,7 +156,7 @@ if __name__ == "__main__":
 
         elif "close paint" in query:
             os.system("taskkill /f /im mspaint.exe")
-            
+
         elif "tell me a joke" in query:
             results = wikipedia.summary(query, sentences=2)
             print(results)
@@ -155,7 +166,7 @@ if __name__ == "__main__":
             music_dir = r"C:\Users\Sumit\Music"
             songs = os.listdir(music_dir)
             os.startfile(os.path.join(music_dir, random.choice(songs)))
-            
+
         elif "play a song by" in query:
             song = query.replace("play a song by", "")
             wk.playonyt(song)
@@ -185,7 +196,7 @@ if __name__ == "__main__":
                 k = cv2.waitKey(50)
                 if k == 27:
                     break
-                elif "take a picture" in query:  
+                elif "take a picture" in query:
                     speak("Taking a picture...")
                     speak("Image captured")
                     speak("tell me a name for the file")
@@ -212,7 +223,7 @@ if __name__ == "__main__":
             result = calculate_expression(expression)
             print("The result is: " + str(result))
             speak("The result is: " + str(result))
-            
+
         elif "my ip address" in query:
             speak("checking")
             try:
@@ -263,7 +274,7 @@ if __name__ == "__main__":
             pyautogui.hotkey('alt', 'space')
             time.sleep(1)
             pyautogui.press('n')
-            
+
         elif "play" in query:
             vid = query.replace("play", "")
             wk.playonyt(vid)
