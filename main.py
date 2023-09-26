@@ -209,20 +209,13 @@ if __name__ == "__main__":
             while True:
                 ret, img = cap.read()
                 cv2.imshow('webcam', img)
-                k = cv2.waitKey(50)
+                k = cv2.waitKey(5)
                 if k == 27:
                     break
-                elif "take a picture" in query:
-                    speak("Taking a picture...")
-                    speak("Press a key to capture the image.")
-                    keyboard.wait("enter") 
-                    speak("Please enter a name for the file:")
-                    name = input().lower()
-                    if img is not None:
-                        cv2.imwrite(f"{name}.jpg", img)
-                        speak("Image saved.")
-                    else:
-                        speak("Failed to capture the image.")
+                elif k == ord('c'):
+                    cv2.imwrite('captured_image.jpg', img)
+                    print("Image captured and saved as 'captured_image.jpg'")
+                    break
             cap.release()
             cv2.destroyAllWindows()
 
