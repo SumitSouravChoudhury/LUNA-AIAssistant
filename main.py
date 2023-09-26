@@ -12,7 +12,7 @@ import pyautogui
 import time
 import operator
 import requests
-from selenium import webdriver
+import keyboard
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -214,11 +214,15 @@ if __name__ == "__main__":
                     break
                 elif "take a picture" in query:
                     speak("Taking a picture...")
-                    speak("Image captured")
-                    speak("tell me a name for the file")
-                    name = takeCommand().lower()
-                    cv2.imwrite(f"{name}.jpg", img)
-                    speak("Image saved")
+                    speak("Press a key to capture the image.")
+                    keyboard.wait("enter") 
+                    speak("Please enter a name for the file:")
+                    name = input().lower()
+                    if img is not None:
+                        cv2.imwrite(f"{name}.jpg", img)
+                        speak("Image saved.")
+                    else:
+                        speak("Failed to capture the image.")
             cap.release()
             cv2.destroyAllWindows()
 
