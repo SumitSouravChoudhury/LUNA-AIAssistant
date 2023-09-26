@@ -91,8 +91,8 @@ if __name__ == "__main__":
                 "My name is Luna. Stands for Logical Understanding and Navigational Assistant.")
 
         elif "who created you" in query:
-            print("My creator is The SHIP")
-            speak("My creator is The SHIP")
+            print("My creator is The SHIPP")
+            speak("My creator is The SHIPP")
 
         elif "open google" in query:
             webbrowser.open_new_tab("google.com")
