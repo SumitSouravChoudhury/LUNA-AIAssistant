@@ -12,7 +12,7 @@ import pyautogui
 import time
 import operator
 import requests
-import keyboard
+from googletrans import Translator, LANGUAGES
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -46,6 +46,7 @@ def takeCommand():
     try:
         print("Recognizing...")
         query = r.recognize_google(audio, language='en-in')
+        query = query.replace("Luna", "")
         print(f"User said: {query}\n")
 
     except Exception as e:
@@ -76,6 +77,36 @@ def calculate_expression(expression):
         return "Error: " + str(e)
 
 
+def get_weather(city):
+    base_url = "https://api.openweathermap.org/data/2.5/weather?"
+    complete_url = f"{base_url}q={city}&appid=ed5e37c9d02774e8aa03d9810a6f7663&units=metric"
+
+    response = requests.get(complete_url)
+    weather_data = response.json()
+
+    if weather_data["cod"] != "404":
+        mai_data = weather_data["main"]
+        temperature = mai_data["temp"]
+        humidity = mai_data["humidity"]
+        weather_info = weather_data["weather"][0]["description"]
+
+        weather_report = f"The weather in {city} today is {weather_info}. "
+        weather_report += f"The temperature is {temperature}°C, and the humidity is {humidity}%."
+        return weather_report
+    else:
+        return "City not found."
+
+
+def translate_command(command, target_language='en'):
+    translator = Translator()
+    try:
+        translated = translator.translate(
+            command, src='en', dest=target_language)
+        return translated.text
+    except Exception as e:
+        return str(e)
+
+
 if __name__ == "__main__":
 
     wishMe()
@@ -84,62 +115,37 @@ if __name__ == "__main__":
 
         query = takeCommand().lower()
 
-        if "who are you" in query:
+        if "Luna" and "who are you" in query:
             print(
                 "My name is Luna. Stands for Logical Understanding and Navigational Assistant.")
             speak(
                 "My name is Luna. Stands for Logical Understanding and Navigational Assistant.")
 
-        elif "who created you" in query:
+        elif "Luna" and "who created you" in query:
             print("My creator is The SHIPP")
             speak("My creator is The SHIPP")
 
-        elif "open google" in query:
-            webbrowser.open_new_tab("google.com")
+        elif "Luna" and "what is the weather today" in query:
+            speak("Please specify the city for the weather report.")
+            city = takeCommand().lower()
+            weather_report = get_weather(city)
+            print(weather_report)
+            speak(weather_report)
 
-        elif "search in google" in query:
-            speak("What should I search?")
-            qry = takeCommand().lower()
-            webbrowser.open_new_tab(f"{qry}")
-            results = wikipedia.summary(qry, sentences=2)
-            print(results)
-            speak(results)
+        elif "Luna" and "translate" in query:
+            target_language = query.split("to")[-1].strip()
 
-        elif "open youtube" in query:
-            webbrowser.open_new_tab("youtube.com")
+            if target_language:
+                speak("What should I translate?")
+                command_to_translate = takeCommand()
+                translated_command = translate_command(
+                    command_to_translate, target_language)
+                print(f"Translated command: {translated_command}")
+                speak(f"Translated command: {translated_command}")
+            else:
+                speak("Please specify the target language for translation.")
 
-        elif "search in youtube" in query:
-            speak("What would you like to watch?")
-            qrry = takeCommand().lower()
-            webbrowser.open_new_tab(
-                f"www.youtube.com/results?search_query={qrry}")
-            
-        elif "open WhatsApp" in query:
-            webbrowser.open_new_tab("web.whatsapp.com")
-            print("WhatsApp Web is now open in your default web browser.")
-            speak("WhatsApp Web is now open in your default web browser.")
-            
-        elif "open chat of" in query:
-            name = query.replace("open chat of", "").strip()  
-            pyautogui.click(x=100, y=100)  
-            time.sleep(1)
-            pyautogui.write(name, interval=0.1)  
-            time.sleep(1)  
-            pyautogui.press("enter")
-            print(f"Opening chat with {name} in WhatsApp.")
-            speak(f"Opening chat with {name} in WhatsApp.")
-
-        elif "close youtube" in query:
-            os.system("taskkill /f /im msedge.exe")
-            os.system("taskkill /f /im chrome.exe")
-
-        elif "close browser" in query:
-            os.system("taskkill /f /im msedge.exe")
-
-        elif "close chrome" in query:
-            os.system("taskkill /f /im chrome.exe")
-
-        elif "tell me a joke" in query:
+        elif "Luna" and "tell me a joke" in query:
             joke_url = "https://official-joke-api.appspot.com/random_joke"
             response = requests.get(joke_url)
             if response.status_code == 200:
@@ -150,61 +156,7 @@ if __name__ == "__main__":
                 print(joke)
                 speak(joke)
 
-        elif "open new window" in query:
-            pyautogui.hotkey('ctrl', 'n')
-
-        elif "open notepad" in query:
-            npath = "C:\WINDOWS\system32\\notepad.exe"
-            os.startfile(npath)
-
-        elif "close notepad" in query:
-            os.system("taskkill /f /im notepad.exe")
-
-        elif "open command prompt" in query:
-            os.system("start cmd")
-
-        elif "close command prompt" in query:
-            os.system("taskkill /f /im cmd.exe")
-
-        elif "open paint" in query:
-            os.startfile(
-                r"C:\Users\Sumit\AppData\Local\Microsoft\WindowsApps\mspaint.exe")
-
-        elif "close paint" in query:
-            os.system("taskkill /f /im mspaint.exe")
-
-        elif "tell me a joke" in query:
-            results = wikipedia.summary(query, sentences=2)
-            print(results)
-            speak(results)
-
-        elif "play music" in query:
-            music_dir = r"C:\Users\Sumit\Music"
-            songs = os.listdir(music_dir)
-            os.startfile(os.path.join(music_dir, random.choice(songs)))
-
-        elif "play a song by" in query:
-            song = query.replace("play a song by", "")
-            wk.playonyt(song)
-
-        elif "close music" in query:
-            os.system("taskkill /f /im vlc.exe")
-
-        elif "close movie" in query:
-            os.system("taskkill /f /im vlc.exe")
-
-        elif "tell me the time" in query:
-            strTime = datetime.datetime.now().strftime("%H:%M:%S")
-            print(strTime)
-            speak(f"Sir, the time is {strTime}")
-
-        elif "shut down the system" in query:
-            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-
-        elif "hibernate the system" in query:
-            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-
-        elif "open camera" in query:
+        elif "Luna" and "open camera" in query:
             cap = cv2.VideoCapture(0)
             while True:
                 ret, img = cap.read()
@@ -213,17 +165,15 @@ if __name__ == "__main__":
                 if k == 27:
                     break
                 elif k == ord('c'):
-                    cv2.imwrite('captured_image.jpg', img)
-                    print("Image captured and saved as 'captured_image.jpg'")
+                    speak("tell me a name for the file")
+                    img_name = takeCommand().lower()
+                    cv2.imwrite(f'{img_name}.jpg', img)
+                    print("Image captured and saved")
                     break
             cap.release()
             cv2.destroyAllWindows()
 
-        elif "go to sleep" in query:
-            speak("I am switching off")
-            sys.exit()
-
-        elif "take screenshot" in query:
+        elif "Luna" and "take a screenshot" in query:
             speak("tell me a name for the file")
             name = takeCommand().lower()
             time.sleep(3)
@@ -231,13 +181,13 @@ if __name__ == "__main__":
             img.save(f"{name}.png")
             speak("Screenshot Saved")
 
-        elif "calculate" in query:
+        elif "Luna" and "calculate" in query:
             expression = query.replace("calculate", "")
             result = calculate_expression(expression)
             print("The result is: " + str(result))
             speak("The result is: " + str(result))
 
-        elif "my ip address" in query:
+        elif "Luna" and "my ip address" in query:
             speak("checking")
             try:
                 ipAdd = requests.get('https://api.ipify.org').text
@@ -247,52 +197,165 @@ if __name__ == "__main__":
             except Exception as e:
                 speak("Network is weak, please try again later")
 
-        elif "volume up" in query:
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
-            pyautogui.press("volumeup")
+        elif "Luna" and "create a folder" in query:
+            speak("Sure, please specify the folder name.")
+            folder_name = takeCommand()
+            if folder_name != "None":
+                folder_path = os.path.join("C:\\Users\\Sumit\\Desktop", folder_name)
+                try:
+                    os.mkdir(folder_path)
+                    print(f"Folder '{folder_name}' created at '{folder_path}'")
+                    speak(f"Folder '{folder_name}' created at '{folder_path}'")
+                except OSError as e:
+                    print(f"Error creating folder: {e}")
+                    speak(f"Sorry, there was an error creating the folder.")
+            else:
+                speak("Sorry, I couldn't understand the folder name.")
 
-        elif "volume down" in query:
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
-            pyautogui.press("volumedown")
+        elif "Luna" and "tell me the time" in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")
+            print(strTime)
+            speak(f"Sir, the time is {strTime}")
+            
+        elif "Luna" and "flip a coin" in query:
+            result = random.randint(0, 1)
+            if result == 0:
+                print("It's heads!")
+                speak("It's heads!")
+            else:
+                print("It's tails!")
+                speak("It's tails!")
 
-        elif "type" in query:
+        elif "Luna" and "open google" in query:
+            webbrowser.open_new_tab("google.com")
+
+        elif "Luna" and "open youtube" in query:
+            webbrowser.open_new_tab("youtube.com")
+
+        elif "Luna" and "open notepad" in query:
+            npath = "C:\WINDOWS\system32\\notepad.exe"
+            os.startfile(npath)
+
+        elif "Luna" and "open settings" in query:
+            os.startfile("ms-settings:")
+
+        elif "Luna" and "open command prompt" in query:
+            os.system("start cmd")
+
+        elif "Luna" and "open paint" in query:
+            os.startfile(
+                r"C:\Users\Sumit\AppData\Local\Microsoft\WindowsApps\mspaint.exe")
+
+        elif "Luna" and "open new window" in query:
+            pyautogui.hotkey('ctrl', 'n')
+
+        elif "Luna" and "close youtube" in query:
+            os.system("taskkill /f /im msedge.exe")
+            os.system("taskkill /f /im chrome.exe")
+
+        elif "Luna" and "close browser" in query:
+            os.system("taskkill /f /im msedge.exe")
+
+        elif "Luna" and "close chrome" in query:
+            os.system("taskkill /f /im chrome.exe")
+
+        elif "Luna" and "close notepad" in query:
+            os.system("taskkill /f /im notepad.exe")
+
+        elif "Luna" and "close command prompt" in query:
+            os.system("taskkill /f /im cmd.exe")
+
+        elif "Luna" and "close paint" in query:
+            os.system("taskkill /f /im mspaint.exe")
+
+        elif "Luna" and "close music" in query:
+            os.system("taskkill /f /im vlc.exe")
+
+        elif "Luna" and "close movie" in query:
+            os.system("taskkill /f /im vlc.exe")
+
+        elif "Luna" and "search in google" in query:
+            speak("What should I search?")
+            qry = takeCommand().lower()
+            webbrowser.open_new_tab(f"{qry}")
+            results = wikipedia.summary(qry, sentences=2)
+            print(results)
+            speak(results)
+
+        elif "Luna" and "search in youtube" in query:
+            speak("What would you like to watch?")
+            qrry = takeCommand().lower()
+            webbrowser.open_new_tab(
+                f"www.youtube.com/results?search_query={qrry}")
+
+        elif "Luna" and "play music" in query:
+            music_dir = r"C:\Users\Sumit\Music"
+            songs = os.listdir(music_dir)
+            os.startfile(os.path.join(music_dir, random.choice(songs)))
+
+        elif "Luna" and "play a song by" in query:
+            song = query.replace("play a song by", "")
+            wk.playonyt(song)
+
+        elif "Luna" and "play" and "youtube" in query:
+            vid = query.replace("play", "")
+            wk.playonyt(vid)
+
+        elif "Luna" and "type" in query:
             query = query.replace("type", "")
             pyautogui.typewrite(f"{query}", 0.1)
 
-        elif "undo" in query:
+        elif "Luna" and "undo" in query:
             pyautogui.hotkey('ctrl', 'z')
 
-        elif "maximize window" in query:
+        elif "Luna" and "maximize window" in query:
             pyautogui.hotkey('alt', 'space')
             time.sleep(1)
             pyautogui.press('x')
 
-        elif "minimise window" in query:
+        elif "Luna" and "minimise window" in query:
             pyautogui.hotkey('alt', 'space')
             time.sleep(1)
             pyautogui.press('n')
 
-        elif "play" in query:
-            vid = query.replace("play", "")
-            wk.playonyt(vid)
+        elif "Luna" and "enter" in query:
+            pyautogui.press('enter')
 
-        elif "what is" in query:
+        elif "Luna" and "shut down the system" in query:
+            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+        elif "Luna" and "hibernate the system" in query:
+            os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+        elif "Luna" and "go to sleep" in query:
+            speak("I am switching off")
+            sys.exit()
+
+        elif "Luna" and "volume up" in query:
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+            pyautogui.press("volumeup")
+
+        elif "Luna" and "volume down" in query:
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+            pyautogui.press("volumedown")
+
+        elif "Luna" and "what is" in query:
             print("Searching Wikipedia")
             speak("Searching Wikipedia")
             query = query.replace("what is", "")
@@ -301,7 +364,7 @@ if __name__ == "__main__":
             print(results)
             speak(results)
 
-        elif "who is" in query:
+        elif "Luna" and "who is" in query:
             speak("Searching Wikipedia")
             query = query.replace("who is", "")
             results = wikipedia.summary(query, sentences=2)
