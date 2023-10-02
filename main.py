@@ -200,12 +200,14 @@ if __name__ == "__main__":
         elif "Luna" and "create a folder" in query:
             speak("Sure, please specify the folder name.")
             folder_name = takeCommand()
+            speak("Please specify the folder path")
+            fold_path = takeCommand()
             if folder_name != "None":
-                folder_path = os.path.join("C:\\Users\\Sumit\\Desktop", folder_name)
+                folder_path = os.path.join(f"C:\\Users\\Sumit\\{fold_path}", folder_name)
                 try:
                     os.mkdir(folder_path)
                     print(f"Folder '{folder_name}' created at '{folder_path}'")
-                    speak(f"Folder '{folder_name}' created at '{folder_path}'")
+                    speak(f"Folder '{folder_name}' created at '{fold_path}'")
                 except OSError as e:
                     print(f"Error creating folder: {e}")
                     speak(f"Sorry, there was an error creating the folder.")
