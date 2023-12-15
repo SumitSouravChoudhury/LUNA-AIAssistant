@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div class="box">
+        <h1>Voice Assistant</h1>
+        <div id="result">
+            <p>Assistant response will be displayed here.</p>
+        </div>
+        <button id="start-button">Start Listening</button>
+        <button id="stop-button" disabled>Stop Listening</button>
+    </div>
+
+    <script>
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const resultDiv = document.getElementById('result');
+
+        // Function to send audio to the server and get a response
+        async function sendAudio(blob) {
+            const formData = new FormData();
+            formData.append('audio', blob);
+
+            try {
+                const response = await fetch('/voice_assistant', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await response.json();
+                resultDiv.textContent = data.response;
+            } catch (error) {
+                console.error(error);
+                resultDiv.textContent = 'An error occurred.';
+            }
+        }
+
+        // Initialize the speech recognition
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            resultDiv.textContent = 'Listening...';
+        };
+
+        recognition.onend = () => {
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            resultDiv.textContent = 'Voice recognition stopped.';
+        };
+
+        recognition.onresult = (event) => {
+            const blob = new Blob([event.results[0][0].transcript], { type: 'audio/wav' });
+            sendAudio(blob);
+        };
+
+        startButton.addEventListener('click', () => {
+            recognition.start();
+        });
+
+        stopButton.addEventListener('click', () => {
+            recognition.stop();
+        });
+    </script>
+</body>
+</html>

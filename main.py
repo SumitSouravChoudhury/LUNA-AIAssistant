@@ -13,7 +13,6 @@ import time
 import operator
 import requests
 from googletrans import Translator, LANGUAGES
-from geopy.geocoders import Nominatim
 import requests
 
 engine = pyttsx3.init('sapi5')
@@ -216,54 +215,24 @@ if __name__ == "__main__":
                     speak(f"Sorry, there was an error creating the folder.")
             else:
                 speak("Sorry, I couldn't understand the folder name.")
-                
-        elif "Luna" and "restaurants near me" in query:
-            try:
-                geolocator = Nominatim(user_agent="restaurant_finder")
-                location = geolocator.geocode("Rewa Engineering College", "India") 
-                if location:
-                    latitude = location.latitude
-                    longitude = location.longitude
-                    nominatim_url = f"https://nominatim.openstreetmap.org/reverse?lat={latitude}&lon={longitude}&format=json"
-                    response = requests.get(nominatim_url)
-                    location_data = response.json()
 
-                    if "address" in location_data:
-                        city = location_data["address"].get("city", "")
-                        country = location_data["address"].get("country", "")
-
-                        search_query = "restaurants"
-                        search_url = f"https://nominatim.openstreetmap.org/search?format=json&q={search_query}&city={city}&country={country}"
-                        response = requests.get(search_url)
-                        restaurant_data = response.json()
-
-                        if restaurant_data:
-                            restaurant_info = ""
-                            for i, restaurant in enumerate(restaurant_data):
-                                name = restaurant.get("display_name", "Name not available")
-                                restaurant_info += f"{i + 1}. {name}\n"
-
-                            print("Here are some nearby restaurants:\n")
-                            print(restaurant_info)
-                            speak("Here are some nearby restaurants:\n")
-                            speak(restaurant_info)
-
-                        else:
-                            print("No restaurants found nearby.")
-                            speak("I'm sorry, I couldn't find any restaurants nearby.")
-
-                    else:
-                        print("Location data not available.")
-                        speak("I couldn't determine your location.")
-
-                else:
-                    print("Location not found.")
-                    speak("I couldn't determine your location.")
-
-            except Exception as e:
-                print(f"Error: {e}")
-                speak("Sorry, there was an error while fetching restaurant information.")
-
+        elif "Luna" and "create a file" in query:
+            speak("Sure, please specify the file name.")
+            file_name = takeCommand()
+            speak("Please specify the file path")
+            file_path = takeCommand()
+            if file_name != "None":
+                file_path = os.path.join(
+                        f"C:\\Users\\Sumit\\Desktop\\{file_path}", file_name)
+                try:
+                    with open(file_path, 'w') as file:
+                        print(f"File '{file_name}' created at '{file_path}'")
+                        speak(f"File '{file_name}' created at '{file_path}'")
+                except OSError as e:
+                    print(f"Error creating file: {e}")
+                    speak(f"Sorry, there was an error creating the file.")
+            else:
+                speak("Sorry, I couldn't understand the file name.")
 
         elif "Luna" and "tell me the time" in query:
             strTime = datetime.datetime.now().strftime("%H:%M:%S")
